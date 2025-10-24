@@ -1,0 +1,35 @@
+{
+    "Routes": [
+        {
+            "DownstreamPathTemplate": "/api/urls",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "urlshortener-service",
+                    "Port": 8080
+                }
+            ],
+            "UpstreamPathTemplate": "/api/shorten",
+            "UpstreamHttpMethod": [
+                "Post"
+            ]
+        },
+        {
+            "DownstreamPathTemplate": "/{shortCode}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "redirect-service",
+                    "Port": 8080
+                }
+            ],
+            "UpstreamPathTemplate": "/{shortCode}",
+            "UpstreamHttpMethod": [
+                "Get"
+            ]
+        }
+    ],
+    "GlobalConfiguration": {
+        "BaseUrl": "http://gateway:8080"
+    }
+}
