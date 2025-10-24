@@ -1,17 +1,23 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["URLShortener.AnalyticsService.csproj", "./"]
-COPY ["../../Shared/URLShortener.Shared.csproj", "../../Shared/"]
+# Copy shared project
+COPY ["src/Shared/URLShortener.Shared.csproj", "Shared/"]
 
-RUN dotnet restore "URLShortener.AnalyticsService.csproj"
+# Copy service project
+COPY ["src/Services/AnalyticsService/URLShortener.AnalyticsService.csproj", "Services/AnalyticsService/"]
 
-COPY . .
+# Restore dependencies
+RUN dotnet restore "Services/AnalyticsService/URLShortener.AnalyticsService.csproj"
 
+# Copy everything else
+COPY ["src/Shared/", "Shared/"]
+COPY ["src/Services/AnalyticsService/", "Services/AnalyticsService/"]
+
+WORKDIR "/src/Services/AnalyticsService"
 RUN dotnet build "URLShortener.AnalyticsService.csproj" -c Release -o /app/build
 
 FROM build AS publish
@@ -20,7 +26,4 @@ RUN dotnet publish "URLShortener.AnalyticsService.csproj" -c Release -o /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
-ENV ASPNETCORE_ENVIRONMENT=Production
-
 ENTRYPOINT ["dotnet", "URLShortener.AnalyticsService.dll"]
