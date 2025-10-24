@@ -1,0 +1,8 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "src/Services/UrlShortenerService/Dockerfile"
+
+[deploy]
+startCommand = ""
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10

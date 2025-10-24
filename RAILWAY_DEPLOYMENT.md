@@ -40,14 +40,12 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
 2. Chọn repository `URLShortener`
 3. Tên service: `gateway`
 4. Trong **Settings** → **Source**:
-   - **Root Directory**: `/` (mặc định)
+   - **Root Directory**: `src/Gateway` ⚠️ **Quan trọng!**
    - **Branch**: `master`
-5. Trong **Settings** → **Build**:
-   - **Builder**: `DOCKERFILE`
-   - **Dockerfile Path**: `src/Gateway/Dockerfile`
-   - **Watch Paths**: `src/Gateway/**` (optional - để chỉ rebuild khi Gateway thay đổi)
-6. Trong **Settings** → **Deploy**:
-   - **Restart Policy**: `ON_FAILURE` với 10 retries
+5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
+6. Trong **Settings** → **Build**:
+   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
+   - **Watch Paths**: `src/Gateway/**`, `src/Shared/**` (optional - để rebuild khi có thay đổi)
 7. Trong **Variables**, thêm:
    ```
    ASPNETCORE_ENVIRONMENT=Production
@@ -59,14 +57,12 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
 2. Chọn repository `URLShortener`
 3. Tên service: `urlshortener-service`
 4. Trong **Settings** → **Source**:
-   - **Root Directory**: `/` (mặc định)
+   - **Root Directory**: `src/Services/UrlShortenerService` ⚠️ **Quan trọng!**
    - **Branch**: `master`
-5. Trong **Settings** → **Build**:
-   - **Builder**: `DOCKERFILE`
-   - **Dockerfile Path**: `src/Services/UrlShortenerService/Dockerfile`
-   - **Watch Paths**: `src/Services/UrlShortenerService/**` (optional)
-6. Trong **Settings** → **Deploy**:
-   - **Restart Policy**: `ON_FAILURE` với 10 retries
+5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
+6. Trong **Settings** → **Build**:
+   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
+   - **Watch Paths**: `src/Services/UrlShortenerService/**`, `src/Shared/**` (optional)
 7. Trong **Variables**, thêm:
    ```
    ASPNETCORE_ENVIRONMENT=Production
@@ -80,14 +76,12 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
 2. Chọn repository `URLShortener`
 3. Tên service: `redirect-service`
 4. Trong **Settings** → **Source**:
-   - **Root Directory**: `/` (mặc định)
+   - **Root Directory**: `src/Services/RedirectService` ⚠️ **Quan trọng!**
    - **Branch**: `master`
-5. Trong **Settings** → **Build**:
-   - **Builder**: `DOCKERFILE`
-   - **Dockerfile Path**: `src/Services/RedirectService/Dockerfile`
-   - **Watch Paths**: `src/Services/RedirectService/**` (optional)
-6. Trong **Settings** → **Deploy**:
-   - **Restart Policy**: `ON_FAILURE` với 10 retries
+5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
+6. Trong **Settings** → **Build**:
+   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
+   - **Watch Paths**: `src/Services/RedirectService/**`, `src/Shared/**` (optional)
 7. Trong **Variables**, thêm:
    ```
    ASPNETCORE_ENVIRONMENT=Production
@@ -104,14 +98,12 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
 2. Chọn repository `URLShortener`
 3. Tên service: `analytics-service`
 4. Trong **Settings** → **Source**:
-   - **Root Directory**: `/` (mặc định)
+   - **Root Directory**: `src/Services/AnalyticsService` ⚠️ **Quan trọng!**
    - **Branch**: `master`
-5. Trong **Settings** → **Build**:
-   - **Builder**: `DOCKERFILE`
-   - **Dockerfile Path**: `src/Services/AnalyticsService/Dockerfile`
-   - **Watch Paths**: `src/Services/AnalyticsService/**` (optional)
-6. Trong **Settings** → **Deploy**:
-   - **Restart Policy**: `ON_FAILURE` với 10 retries
+5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
+6. Trong **Settings** → **Build**:
+   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
+   - **Watch Paths**: `src/Services/AnalyticsService/**`, `src/Shared/**` (optional)
 7. Trong **Variables**, thêm:
    ```
    DOTNET_ENVIRONMENT=Production
