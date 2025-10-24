@@ -36,34 +36,20 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
    ```
 
 #### 2.3. Thêm Gateway Service
-1. Click **"+ New"** → **"GitHub Repo"**
-2. Chọn repository `URLShortener`
-3. Tên service: `gateway`
-4. Trong **Settings** → **Source**:
-   - **Root Directory**: `src/Gateway` ⚠️ **Quan trọng!**
-   - **Branch**: `master`
-5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
-6. Trong **Settings** → **Build**:
-   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
-   - **Watch Paths**: `src/Gateway/**`, `src/Shared/**` (optional - để rebuild khi có thay đổi)
-7. Trong **Variables**, thêm:
+1. Click **"+ New"** → **"Empty Service"**
+2. Tên service: `gateway` ⚠️ **Tên này phải khớp với tên trong GitHub Actions!**
+3. **KHÔNG** cần connect GitHub repo ở đây (GitHub Actions sẽ lo)
+4. Trong **Variables**, thêm:
    ```
    ASPNETCORE_ENVIRONMENT=Production
    ASPNETCORE_URLS=http://+:$PORT
    ```
+5. Copy **Service ID** (hoặc Service Name) để dùng trong GitHub Actions
 
 #### 2.4. Thêm URL Shortener Service
-1. Click **"+ New"** → **"GitHub Repo"**
-2. Chọn repository `URLShortener`
-3. Tên service: `urlshortener-service`
-4. Trong **Settings** → **Source**:
-   - **Root Directory**: `src/Services/UrlShortenerService` ⚠️ **Quan trọng!**
-   - **Branch**: `master`
-5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
-6. Trong **Settings** → **Build**:
-   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
-   - **Watch Paths**: `src/Services/UrlShortenerService/**`, `src/Shared/**` (optional)
-7. Trong **Variables**, thêm:
+1. Click **"+ New"** → **"Empty Service"**
+2. Tên service: `urlshortener-service`
+3. Trong **Variables**, thêm:
    ```
    ASPNETCORE_ENVIRONMENT=Production
    ASPNETCORE_URLS=http://+:$PORT
@@ -72,17 +58,9 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
    ```
 
 #### 2.5. Thêm Redirect Service
-1. Click **"+ New"** → **"GitHub Repo"**
-2. Chọn repository `URLShortener`
-3. Tên service: `redirect-service`
-4. Trong **Settings** → **Source**:
-   - **Root Directory**: `src/Services/RedirectService` ⚠️ **Quan trọng!**
-   - **Branch**: `master`
-5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
-6. Trong **Settings** → **Build**:
-   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
-   - **Watch Paths**: `src/Services/RedirectService/**`, `src/Shared/**` (optional)
-7. Trong **Variables**, thêm:
+1. Click **"+ New"** → **"Empty Service"**
+2. Tên service: `redirect-service`
+3. Trong **Variables**, thêm:
    ```
    ASPNETCORE_ENVIRONMENT=Production
    ASPNETCORE_URLS=http://+:$PORT
@@ -94,17 +72,9 @@ Hướng dẫn deploy URLShortener Microservices lên Railway với GitHub Actio
    ```
 
 #### 2.6. Thêm Analytics Service
-1. Click **"+ New"** → **"GitHub Repo"**
-2. Chọn repository `URLShortener`
-3. Tên service: `analytics-service`
-4. Trong **Settings** → **Source**:
-   - **Root Directory**: `src/Services/AnalyticsService` ⚠️ **Quan trọng!**
-   - **Branch**: `master`
-5. Railway sẽ tự động detect file `railway.toml` và build theo Dockerfile đã config
-6. Trong **Settings** → **Build**:
-   - **Builder**: Để mặc định - Railway sẽ đọc từ `railway.toml`
-   - **Watch Paths**: `src/Services/AnalyticsService/**`, `src/Shared/**` (optional)
-7. Trong **Variables**, thêm:
+1. Click **"+ New"** → **"Empty Service"**
+2. Tên service: `analytics-service`
+3. Trong **Variables**, thêm:
    ```
    DOTNET_ENVIRONMENT=Production
    ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
@@ -161,44 +131,72 @@ Cập nhật file `src/Gateway/ocelot.json` với các internal URLs của Railw
 
 ## 🔐 Setup GitHub Actions
 
-### Bước 1: Lấy Railway Token
+### Bước 1: Lấy Railway Token và Project ID
 
 1. Vào [Railway Dashboard](https://railway.app/account/tokens)
 2. Click **"Create Token"**
 3. Đặt tên: `GitHub Actions Deploy`
 4. Copy token (chỉ hiển thị 1 lần!)
+5. Vào Project của bạn trên Railway → **Settings**
+6. Copy **Project ID** (dạng: `550e8400-e29b-41d4-a716-446655440000`)
 
-### Bước 2: Thêm Secret vào GitHub
+### Bước 2: Thêm Secrets vào GitHub
 
 1. Vào GitHub repository → **Settings** → **Secrets and variables** → **Actions**
 2. Click **"New repository secret"**
-3. Tên: `RAILWAY_TOKEN`
-4. Value: Paste token từ Railway
-5. Click **"Add secret"**
+3. Thêm các secrets sau:
+   - **Name**: `RAILWAY_TOKEN`
+   - **Value**: Paste token từ Railway (từ bước 1)
+4. Thêm secret thứ 2:
+   - **Name**: `RAILWAY_PROJECT_ID`
+   - **Value**: Paste Project ID từ Railway (từ bước 1)
+5. Click **"Add secret"** cho mỗi secret
 
-### Bước 3: Test GitHub Actions
+### Bước 3: Deploy lần đầu
 
-1. Push code lên GitHub:
+1. Commit và push code lên GitHub:
    ```bash
    git add .
-   git commit -m "Add Railway deployment configuration"
+   git commit -m "Setup Railway deployment with GitHub Actions"
    git push origin master
    ```
 
-2. Vào tab **Actions** trên GitHub để xem deployment progress
+2. Vào tab **Actions** trên GitHub repository
 
-## 🔄 Deployment Flow
+3. Xem workflow **"Deploy to Railway"** đang chạy
+
+4. GitHub Actions sẽ:
+   - Install Railway CLI
+   - Link đến project của bạn
+   - Deploy Gateway với `--dockerfile=src/Gateway/Dockerfile`
+   - Deploy UrlShortener với `--dockerfile=src/Services/UrlShortenerService/Dockerfile`
+   - Deploy Redirect với `--dockerfile=src/Services/RedirectService/Dockerfile`
+   - Deploy Analytics với `--dockerfile=src/Services/AnalyticsService/Dockerfile`
+
+5. ✅ Sau khi workflow hoàn tất, check Railway Dashboard để xem services đã deployed!
+
+## 🔄 Deployment Flow với GitHub Actions
 
 ```mermaid
-graph LR
-    A[Push to GitHub] --> B[GitHub Actions Triggered]
-    B --> C[Install Railway CLI]
-    C --> D[Deploy Gateway]
-    D --> E[Deploy URL Shortener]
-    E --> F[Deploy Redirect Service]
-    F --> G[Deploy Analytics]
-    G --> H[✅ Complete]
+graph TB
+    A[Push code to GitHub master] --> B[GitHub Actions Triggered]
+    B --> C[Checkout repository]
+    C --> D[Install Railway CLI]
+    D --> E[Deploy Gateway<br/>--dockerfile=src/Gateway/Dockerfile]
+    E --> F[Deploy UrlShortener<br/>--dockerfile=src/Services/UrlShortenerService/Dockerfile]
+    F --> G[Deploy Redirect<br/>--dockerfile=src/Services/RedirectService/Dockerfile]
+    G --> H[Deploy Analytics<br/>--dockerfile=src/Services/AnalyticsService/Dockerfile]
+    H --> I[✅ All Services Deployed]
 ```
+
+### Giải thích workflow:
+
+1. **Push to GitHub** → Trigger workflow tự động
+2. **Railway CLI** → Install và authenticate với token
+3. **railway link** → Connect đến project trên Railway
+4. **railway up --service=xxx --dockerfile=xxx** → Deploy từng service với đúng Dockerfile
+5. **Railway** → Build Docker image và deploy lên cloud
+6. ✅ **Done** → Tất cả services running!
 
 ## 📊 Monitoring & Logs
 

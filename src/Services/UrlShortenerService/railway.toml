@@ -1,6 +1,6 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "src/Services/UrlShortenerService/Dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = ""

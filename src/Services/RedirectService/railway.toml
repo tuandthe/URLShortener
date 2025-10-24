@@ -1,6 +1,6 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "src/Services/RedirectService/Dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = ""

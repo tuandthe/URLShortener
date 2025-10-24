@@ -19,28 +19,32 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy Gateway Service
-        run: railway up --service=gateway
+        run: |
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --service=gateway --dockerfile=src/Gateway/Dockerfile
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        working-directory: ./
 
       - name: Deploy URL Shortener Service
-        run: railway up --service=urlshortener-service
+        run: |
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --service=urlshortener-service --dockerfile=src/Services/UrlShortenerService/Dockerfile
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        working-directory: ./
 
       - name: Deploy Redirect Service
-        run: railway up --service=redirect-service
+        run: |
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --service=redirect-service --dockerfile=src/Services/RedirectService/Dockerfile
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        working-directory: ./
 
       - name: Deploy Analytics Service
-        run: railway up --service=analytics-service
+        run: |
+          railway link ${{ secrets.RAILWAY_PROJECT_ID }}
+          railway up --service=analytics-service --dockerfile=src/Services/AnalyticsService/Dockerfile
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        working-directory: ./
 
       - name: Deployment Complete
         run: echo "✅ All services deployed successfully to Railway!"
