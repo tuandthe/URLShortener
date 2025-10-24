@@ -5,20 +5,17 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy shared project
-COPY ["src/Shared/URLShortener.Shared.csproj", "Shared/"]
+# Copy csproj
+COPY ["URLShortener.UrlShortenerService.csproj", "./"]
+COPY ["../../Shared/URLShortener.Shared.csproj", "../../Shared/"]
 
-# Copy service project
-COPY ["src/Services/UrlShortenerService/URLShortener.UrlShortenerService.csproj", "Services/UrlShortenerService/"]
+# Restore
+RUN dotnet restore "URLShortener.UrlShortenerService.csproj"
 
-# Restore dependencies
-RUN dotnet restore "Services/UrlShortenerService/URLShortener.UrlShortenerService.csproj"
+# Copy source
+COPY . .
 
-# Copy everything else
-COPY ["src/Shared/", "Shared/"]
-COPY ["src/Services/UrlShortenerService/", "Services/UrlShortenerService/"]
-
-WORKDIR "/src/Services/UrlShortenerService"
+# Build
 RUN dotnet build "URLShortener.UrlShortenerService.csproj" -c Release -o /app/build
 
 FROM build AS publish
@@ -27,4 +24,8 @@ RUN dotnet publish "URLShortener.UrlShortenerService.csproj" -c Release -o /app/
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
+ENV ASPNETCORE_ENVIRONMENT=Production
+
 ENTRYPOINT ["dotnet", "URLShortener.UrlShortenerService.dll"]
