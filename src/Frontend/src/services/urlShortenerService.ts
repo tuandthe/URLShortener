@@ -30,7 +30,7 @@ class UrlShortenerService {
     async createShortUrl(originalUrl: string): Promise<CreateShortUrlResponse> {
         try {
             const response = await axios.post<CreateShortUrlResponse>(
-                `${API_BASE_URL}/api/shorten`,
+                `${API_BASE_URL}/api/urls`,
                 {
                     originalUrl
                 } as CreateShortUrlRequest
