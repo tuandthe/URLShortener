@@ -13,33 +13,13 @@ permissions:
   id-token: write
 
 jobs:
-  deploy-backend:
-    name: Deploy Backend Services
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Trigger Render Deployment - Gateway
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_GATEWAY }}
-        
-      - name: Trigger Render Deployment - UrlShortener
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URLSHORTENER }}
-        
-      - name: Trigger Render Deployment - Redirect
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_REDIRECT }}
-
-      - name: Backend Deployment Complete
-        run: echo "✅ All backend services triggered deployment on Render!"
-
   deploy-frontend:
     name: Deploy Frontend to GitHub Pages
     runs-on: ubuntu-latest
     needs: deploy-backend
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
       - name: Checkout code
