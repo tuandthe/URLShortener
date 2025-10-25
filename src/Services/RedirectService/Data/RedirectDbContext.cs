@@ -34,7 +34,7 @@ public class RedirectDbContext : DbContext
 
             entity.Property(e => e.CreatedAt)
                 .IsRequired()
-                .HasColumnType("TIMESTAMP");
+                .HasColumnType("timestamp with time zone");
 
             entity.HasIndex(e => e.ShortCode)
                 .IsUnique()

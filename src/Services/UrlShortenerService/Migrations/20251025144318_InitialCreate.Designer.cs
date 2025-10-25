@@ -12,7 +12,7 @@ using URLShortener.UrlShortenerService.Data;
 namespace URLShortener.UrlShortenerService.Migrations
 {
     [DbContext(typeof(UrlShortenerDbContext))]
-    [Migration("20251025125500_InitialCreate")]
+    [Migration("20251025144318_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -34,7 +34,7 @@ namespace URLShortener.UrlShortenerService.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TIMESTAMP");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("OriginalUrl")
                         .IsRequired()

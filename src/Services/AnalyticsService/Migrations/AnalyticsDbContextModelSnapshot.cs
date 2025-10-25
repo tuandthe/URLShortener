@@ -40,7 +40,7 @@ namespace URLShortener.AnalyticsService.Migrations
                         .HasColumnType("VARCHAR(8)");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("TIMESTAMP");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserAgent")
                         .HasMaxLength(500)

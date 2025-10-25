@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using URLShortener.AnalyticsService.Data;
+using URLShortener.RedirectService.Data;
 
 #nullable disable
 
-namespace URLShortener.AnalyticsService.Migrations
+namespace URLShortener.RedirectService.Migrations
 {
-    [DbContext(typeof(AnalyticsDbContext))]
-    [Migration("20251025125838_InitialCreate")]
+    [DbContext(typeof(RedirectDbContext))]
+    [Migration("20251025144343_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace URLShortener.AnalyticsService.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("URLShortener.Shared.Models.ClickEvent", b =>
+            modelBuilder.Entity("URLShortener.Shared.Models.UrlMapping", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,31 +33,25 @@ namespace URLShortener.AnalyticsService.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("IpAddress")
-                        .HasMaxLength(45)
-                        .HasColumnType("VARCHAR(45)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OriginalUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ShortCode")
                         .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("VARCHAR(8)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("TIMESTAMP");
-
-                    b.Property<string>("UserAgent")
-                        .HasMaxLength(500)
-                        .HasColumnType("VARCHAR(500)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ShortCode")
-                        .HasDatabaseName("IX_ClickEvents_ShortCode");
+                        .IsUnique()
+                        .HasDatabaseName("IX_UrlMappings_ShortCode");
 
-                    b.HasIndex("Timestamp")
-                        .HasDatabaseName("IX_ClickEvents_Timestamp");
-
-                    b.ToTable("ClickEvents");
+                    b.ToTable("UrlMappings");
                 });
 #pragma warning restore 612, 618
         }

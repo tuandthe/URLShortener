@@ -12,9 +12,6 @@ namespace URLShortener.RedirectService.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Drop existing table if exists (for migration from MySQL DATETIME to PostgreSQL TIMESTAMP)
-            migrationBuilder.Sql(@"DROP TABLE IF EXISTS ""UrlMappings"" CASCADE;");
-
             migrationBuilder.CreateTable(
                 name: "UrlMappings",
                 columns: table => new
@@ -23,7 +20,7 @@ namespace URLShortener.RedirectService.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     OriginalUrl = table.Column<string>(type: "TEXT", nullable: false),
                     ShortCode = table.Column<string>(type: "VARCHAR(8)", maxLength: 8, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
