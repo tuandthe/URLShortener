@@ -1,6 +1,6 @@
 # URL Shortener - Microservice Architecture
 
-Hệ thống rút gọn link hoàn chỉnh được xây dựng theo kiến trúc microservice với .NET 8, ReactJS, MySQL và RabbitMQ.
+Hệ thống rút gọn link hoàn chỉnh được xây dựng theo kiến trúc microservice với .NET 8, ReactJS, PostgreSQL và RabbitMQ.
 
 ## 🏗️ Kiến trúc hệ thống
 
@@ -28,7 +28,7 @@ Hệ thống rút gọn link hoàn chỉnh được xây dựng theo kiến trú
        │                        ├────────┐
        ▼                        ▼        │
    ┌────────┐              ┌────────┐   │
-   │ MySQL  │              │ MySQL  │   │
+   │PostgreSQL             │PostgreSQL  │
    │  DB    │              │   DB   │   │
    └────────┘              └────────┘   │
                                         │
@@ -77,92 +77,39 @@ Hệ thống rút gọn link hoàn chỉnh được xây dựng theo kiến trú
 
 ### Infrastructure
 
-- **MySQL**: Database cho URL mappings và analytics
-- **RabbitMQ**: Message broker cho event-driven architecture
+- **PostgreSQL**: Database cho URL mappings và analytics
+- **RabbitMQ**: Message broker cho event-driven architecture (optional với CloudAMQP)
 - **Docker & Docker Compose**: Containerization
-- **Railway**: Cloud deployment platform
+- **Render.com**: Cloud deployment platform (FREE!)
 
-## 🚀 Deploy lên Railway với GitHub Actions
+## 🚀 Deploy lên Render.com với GitHub Actions
 
-### Prerequisites
+### Quick Start
 
-1. Tài khoản [Railway](https://railway.app)
-2. Repository GitHub
-3. Railway Token và Project ID
+1. ✅ Fork/Clone repository này
+2. ✅ Tạo tài khoản miễn phí tại [Render.com](https://render.com)
+3. ✅ Tạo PostgreSQL database trên Render
+4. ✅ Tạo 4 Web Services + 1 Static Site
+5. ✅ Setup GitHub Secrets với Deploy Hooks
+6. ✅ Push code → Auto deploy!
 
-### Bước 1: Setup Railway Project
+### 📖 Hướng dẫn chi tiết
 
-1. Login vào railway.app
-2. Tạo **New Project** → **Empty Project**
-3. Thêm các services:
-   - **MySQL Database**
-   - **RabbitMQ** (Docker image: `rabbitmq:3-management`)
-   - **4 Empty Services**: `gateway`, `urlshortener-service`, `redirect-service`, `analytics-service`
+Xem file **[RENDER_DEPLOYMENT_GUIDE.md](./RENDER_DEPLOYMENT_GUIDE.md)** để có hướng dẫn từng bước chi tiết!
 
-### Bước 2: Configure Environment Variables
+### 🎯 Deployment Flow
 
-**Gateway:**
 ```
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=http://+:$PORT
+Push to GitHub main branch
+         ↓
+GitHub Actions triggered
+         ↓
+Trigger Render Deploy Hooks
+         ↓
+Render rebuilds & deploys services
+         ↓
+✅ Live on Render!
 ```
-
-**UrlShortener Service:**
-```
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=http://+:$PORT
-ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
-BaseUrl=https://${{gateway.RAILWAY_PUBLIC_DOMAIN}}
-```
-
-**Redirect Service:**
-```
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=http://+:$PORT
-ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
-RabbitMQ__HostName=${{rabbitmq.RAILWAY_PRIVATE_DOMAIN}}
-RabbitMQ__Port=5672
-RabbitMQ__UserName=guest
-RabbitMQ__Password=guest
-```
-
-**Analytics Service:**
-```
-DOTNET_ENVIRONMENT=Production
-ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
-RabbitMQ__HostName=${{rabbitmq.RAILWAY_PRIVATE_DOMAIN}}
-RabbitMQ__Port=5672
-RabbitMQ__UserName=guest
-RabbitMQ__Password=guest
-```
-
-### Bước 3: Setup GitHub Secrets
-
-Vào GitHub Repository → Settings → Secrets and variables → Actions
-
-Thêm 2 secrets:
-- **RAILWAY_TOKEN**: Lấy từ railway.app/account/tokens
-- **RAILWAY_PROJECT_ID**: Lấy từ Railway Project Settings
-
-### Bước 4: Deploy
-
-```bash
-git add .
-git commit -m "Deploy to Railway"
-git push origin main
-```
-
-GitHub Actions sẽ tự động:
-- Build Docker images
-- Deploy lên Railway
-- Chạy migrations
-- Start services
-
-### Bước 5: Generate Public Domain
-
-1. Vào Railway Gateway service
-2. Settings → Networking → Generate Domain
-3. Sử dụng domain này để truy cập ứng dụng
 
 ## 🛠️ Tech Stack
 
@@ -170,8 +117,8 @@ GitHub Actions sẽ tự động:
 - **.NET 8**: Web API framework
 - **Ocelot**: API Gateway
 - **Entity Framework Core**: ORM
-- **MySQL**: Relational database
-- **RabbitMQ**: Message broker
+- **PostgreSQL**: Relational database
+- **RabbitMQ/CloudAMQP**: Message broker
 
 ### Frontend
 - **React 18**: UI library
@@ -182,7 +129,7 @@ GitHub Actions sẽ tự động:
 ### DevOps
 - **Docker**: Containerization
 - **GitHub Actions**: CI/CD
-- **Railway**: Cloud platform
+- **Render.com**: Cloud platform (FREE tier available)
 
 ## 📝 API Endpoints
 

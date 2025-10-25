@@ -7,7 +7,7 @@ var builder = Host.CreateApplicationBuilder(args);
 // Configure Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AnalyticsDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseNpgsql(connectionString));
 
 // Register Worker Service
 builder.Services.AddHostedService<Worker>();

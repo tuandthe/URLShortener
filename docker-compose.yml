@@ -1,22 +1,24 @@
 version: '3.8'
 
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: urlshortener-mysql
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: urlshortener-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: Tu@123456789
-      MYSQL_DATABASE: urlshortener
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Tu@123456789
+      POSTGRES_DB: urlshortener
     ports:
-      - "3308:3306"
+      - "5433:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - urlshortener-network
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
-      timeout: 20s
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
       retries: 5
 
   # RabbitMQ Message Broker
@@ -46,12 +48,12 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=urlshortener;User=root;Password=Tu@123456789;"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=urlshortener;Username=postgres;Password=Tu@123456789;"
       BaseUrl: "http://localhost:5000"
     ports:
       - "5001:8080"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks:
       - urlshortener-network
@@ -66,7 +68,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=urlshortener;User=root;Password=Tu@123456789;"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=urlshortener;Username=postgres;Password=Tu@123456789;"
       RabbitMQ__HostName: "rabbitmq"
       RabbitMQ__Port: "5672"
       RabbitMQ__UserName: "guest"
@@ -74,7 +76,7 @@ services:
     ports:
       - "5002:8080"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -90,13 +92,13 @@ services:
     container_name: analytics-service
     environment:
       DOTNET_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: "Server=mysql;Port=3306;Database=urlshortener;User=root;Password=Tu@123456789;"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=urlshortener;Username=postgres;Password=Tu@123456789;"
       RabbitMQ__HostName: "rabbitmq"
       RabbitMQ__Port: "5672"
       RabbitMQ__UserName: "guest"
       RabbitMQ__Password: "guest"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -141,4 +143,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  postgres_data:

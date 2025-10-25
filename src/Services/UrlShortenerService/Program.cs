@@ -23,7 +23,7 @@ builder.Services.AddCors(options =>
 // Configure Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<UrlShortenerDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseNpgsql(connectionString));
 
 // Register services
 builder.Services.AddScoped<IUrlShortenerService, UrlShortenerServiceImpl>();
