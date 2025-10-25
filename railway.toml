@@ -1,8 +1,8 @@
 [build]
 builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+dockerfilePath = "src/Services/AnalyticsService/Dockerfile"
 
 [deploy]
 startCommand = ""
 restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 10
+restartPolicyMaxRetries = 5
