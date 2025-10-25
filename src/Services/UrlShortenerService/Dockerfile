@@ -5,23 +5,24 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project files
-COPY src/Services/UrlShortenerService/URLShortener.UrlShortenerService.csproj UrlShortenerService/
-COPY src/Shared/URLShortener.Shared.csproj Shared/
+# Copy csproj files for restore
+COPY ["src/Services/UrlShortenerService/URLShortener.UrlShortenerService.csproj", "Services/UrlShortenerService/"]
+COPY ["src/Shared/URLShortener.Shared.csproj", "Shared/"]
 
-# Restore
-RUN dotnet restore UrlShortenerService/URLShortener.UrlShortenerService.csproj
+# Restore packages
+RUN dotnet restore "Services/UrlShortenerService/URLShortener.UrlShortenerService.csproj"
 
-# Copy source
-COPY src/Services/UrlShortenerService/ UrlShortenerService/
-COPY src/Shared/ Shared/
+# Copy all source code
+COPY src/Services/UrlShortenerService/. Services/UrlShortenerService/
+COPY src/Shared/. Shared/
 
-# Build
-WORKDIR /src/UrlShortenerService
-RUN dotnet build URLShortener.UrlShortenerService.csproj -c Release -o /app/build
+# Build project
+WORKDIR "/src/Services/UrlShortenerService"
+RUN dotnet build "URLShortener.UrlShortenerService.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish URLShortener.UrlShortenerService.csproj -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/Services/UrlShortenerService"
+RUN dotnet publish "URLShortener.UrlShortenerService.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

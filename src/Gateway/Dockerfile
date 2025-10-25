@@ -5,23 +5,24 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project files (không dùng brackets)
-COPY src/Gateway/URLShortener.Gateway.csproj Gateway/
-COPY src/Shared/URLShortener.Shared.csproj Shared/
+# Copy csproj files for restore
+COPY ["src/Gateway/URLShortener.Gateway.csproj", "Gateway/"]
+COPY ["src/Shared/URLShortener.Shared.csproj", "Shared/"]
 
-# Restore dependencies
-RUN dotnet restore Gateway/URLShortener.Gateway.csproj
+# Restore packages
+RUN dotnet restore "Gateway/URLShortener.Gateway.csproj"
 
-# Copy source code
-COPY src/Gateway/ Gateway/
-COPY src/Shared/ Shared/
+# Copy all source code
+COPY src/Gateway/. Gateway/
+COPY src/Shared/. Shared/
 
-# Build
-WORKDIR /src/Gateway
-RUN dotnet build URLShortener.Gateway.csproj -c Release -o /app/build
+# Build project
+WORKDIR "/src/Gateway"
+RUN dotnet build "URLShortener.Gateway.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish URLShortener.Gateway.csproj -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/Gateway"
+RUN dotnet publish "URLShortener.Gateway.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

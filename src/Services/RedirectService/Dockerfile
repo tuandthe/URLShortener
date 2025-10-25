@@ -5,23 +5,24 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project files
-COPY src/Services/RedirectService/URLShortener.RedirectService.csproj RedirectService/
-COPY src/Shared/URLShortener.Shared.csproj Shared/
+# Copy csproj files for restore
+COPY ["src/Services/RedirectService/URLShortener.RedirectService.csproj", "Services/RedirectService/"]
+COPY ["src/Shared/URLShortener.Shared.csproj", "Shared/"]
 
-# Restore
-RUN dotnet restore RedirectService/URLShortener.RedirectService.csproj
+# Restore packages
+RUN dotnet restore "Services/RedirectService/URLShortener.RedirectService.csproj"
 
-# Copy source
-COPY src/Services/RedirectService/ RedirectService/
-COPY src/Shared/ Shared/
+# Copy all source code
+COPY src/Services/RedirectService/. Services/RedirectService/
+COPY src/Shared/. Shared/
 
-# Build
-WORKDIR /src/RedirectService
-RUN dotnet build URLShortener.RedirectService.csproj -c Release -o /app/build
+# Build project
+WORKDIR "/src/Services/RedirectService"
+RUN dotnet build "URLShortener.RedirectService.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish URLShortener.RedirectService.csproj -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/Services/RedirectService"
+RUN dotnet publish "URLShortener.RedirectService.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
