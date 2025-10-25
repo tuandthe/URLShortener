@@ -59,7 +59,7 @@ jobs:
       - name: Build Frontend
         working-directory: src/Frontend
         env:
-          VITE_API_URL: https://urlshortener-gateway.onrender.com
+          REACT_APP_API_URL: https://urlshortener-gateway.onrender.com
         run: npm run build
 
       - name: Setup Pages
@@ -68,7 +68,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: src/Frontend/dist
+          path: src/Frontend/build
 
       - name: Deploy to GitHub Pages
         id: deployment
