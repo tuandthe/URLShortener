@@ -14,7 +14,7 @@ namespace URLShortener.RedirectService.Migrations
         {
             // Drop existing table if exists (for migration from MySQL DATETIME to PostgreSQL TIMESTAMP)
             migrationBuilder.Sql(@"DROP TABLE IF EXISTS ""UrlMappings"" CASCADE;");
-            
+
             migrationBuilder.CreateTable(
                 name: "UrlMappings",
                 columns: table => new
