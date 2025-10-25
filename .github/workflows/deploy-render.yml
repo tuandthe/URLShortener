@@ -26,9 +26,9 @@ jobs:
         run: |
           curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_REDIRECT }}
         
-      - name: Trigger Render Deployment - Analytics
-        run: |
-          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_ANALYTICS }}
+      # - name: Trigger Render Deployment - Analytics
+      #   run: |
+      #     curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_ANALYTICS }}
 
       - name: Deployment Complete
         run: echo "✅ All services triggered deployment on Render!"
