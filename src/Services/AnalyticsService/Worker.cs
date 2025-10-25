@@ -39,11 +39,11 @@ public class Worker : BackgroundService
             // Run database migration
             using var scope = _serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AnalyticsDbContext>();
-            
+
             _logger.LogInformation("Starting database migration...");
             await dbContext.Database.MigrateAsync(cancellationToken);
             _logger.LogInformation("Database migration completed successfully");
-            
+
             await InitializeRabbitMqAsync();
             await base.StartAsync(cancellationToken);
         }
