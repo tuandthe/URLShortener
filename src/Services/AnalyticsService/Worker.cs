@@ -58,7 +58,8 @@ public class Worker : BackgroundService
             HostName = _configuration["RabbitMQ:HostName"] ?? "localhost",
             Port = int.Parse(_configuration["RabbitMQ:Port"] ?? "5672"),
             UserName = _configuration["RabbitMQ:UserName"] ?? "guest",
-            Password = _configuration["RabbitMQ:Password"] ?? "guest"
+            Password = _configuration["RabbitMQ:Password"] ?? "guest",
+            VirtualHost = _configuration["RabbitMQ:VirtualHost"] ?? "/"
         };
 
         var retryCount = 0;
