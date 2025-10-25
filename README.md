@@ -1,200 +1,189 @@
+
 # URL Shortener - Microservices
+# URL Shortener - Microservices# URL Shortener - Microservices
+
 
 Hệ thống rút gọn URL với kiến trúc microservices: .NET 8, React, PostgreSQL, RabbitMQ.
 
-**� Live Demo**: [Frontend](https://tuandthe.github.io/URLShortener) | [API Gateway](https://urlshortener-gateway.onrender.com)
+🏗️ Kiến trúc hệ thống
+┌─────────────┐
+│   Frontend  │ (ReactJS)
+│  Port 3000  │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ API Gateway │ (Ocelot)
+│  Port 5000  │
+└──────┬──────┘
+       │
+       ├─────────────────────────┐
+       │                         │
+       ▼                         ▼
+┌──────────────┐        ┌───────────────┐
+│UrlShortener  │        │   Redirect    │
+│   Service    │        │    Service    │
+│  Port 5001   │        │   Port 5002   │
+└──────┬───────┘        └───────┬───────┘
+       │                        │
+       │                        ├────────┐
+       ▼                        ▼        │
+   ┌────────┐              ┌────────┐   │
+   │PostgreSQL             │PostgreSQL  │
+   │  DB    │              │   DB   │   │
+   └────────┘              └────────┘   │
+                                        │
+                              ┌─────────▼────────┐
+                              │    RabbitMQ      │
+                              └─────────┬────────┘
+                                        │
+                                        ▼
+                              ┌──────────────────┐
+                              │    Analytics     │
+                              │     Service      │
+                              │   (Worker)       │
+                              └──────────────────┘
+## 📦 Các thành phần
 
----
 
-## 🏗️ Architecture
+### Backend Services (.NET 8)
+
+1. **API Gateway** - https://urlshortener-gateway.onrender.com
+   - Ocelot API Gateway
+   - Routing và Load Balancing
+   - HTTPS + CORS enabled
+   - **Platform**: Render.com (FREE)
+
+2. **URL Shortener Service** - https://urlshortener-service-lwo4.onrender.com
+   - Tạo mã rút gọn link (8 ký tự)
+   - Quản lý URL mappings
+   - RESTful API với Swagger
+   - **Platform**: Render.com (FREE)
+
+3. **Redirect Service** - https://urlshortener-redirect.onrender.com
+   - Xử lý redirect từ short code → original URL
+   - Ghi nhận click events
+   - Publish events tới RabbitMQ
+   - **Platform**: Render.com (FREE)
+
+4. **Analytics Service**
+   - Consume click events từ RabbitMQ
+   - Lưu trữ analytics data (ClickEvents table)
+   - Thống kê số lượt click
+   - **Platform**: Railway.app (~$0.50-1/month)
+
+### Frontend
+
+- **React 18** với TypeScript
+- **Vite** build tool
+- **Axios** cho HTTP requests
+- Giao diện tạo và quản lý short URLs
+- **Platform**: GitHub Pages (FREE)
+- **URL**: https://tuandthe.github.io/URLShortener
+
+### Infrastructure
+
+- **PostgreSQL 16**: Database trên Render.com (FREE)
+  - Shared database cho tất cả services
+  - Tables: `UrlMappings`, `ClickEvents`
+- **RabbitMQ**: CloudAMQP (FREE tier - Little Lemur)
+  - Host: shark.rmq.cloudamqp.com
+  - VirtualHost: mrawftdh
+- **Docker**: Local development với Docker Compose
+- **CI/CD**: GitHub Actions tự động deploy
+
+## 🎯 Deployment Flow
 
 ```
-Frontend (React) → GitHub Pages (FREE)
-    ↓
-API Gateway (Ocelot) → Render.com (FREE)
-    ↓
-    ├─→ UrlShortener Service → Render.com (FREE)
-    └─→ Redirect Service → Render.com (FREE)
+Push to GitHub main branch
          ↓
-         RabbitMQ → CloudAMQP (FREE)
+GitHub Actions triggered
          ↓
-         Analytics Worker → Railway.app (~$1/month)
+    ┌────┴────┐
+    ▼         ▼
+Backend    Frontend
+(Render)   (Build & Deploy)
          ↓
-    PostgreSQL → Render.com (FREE)
+    GitHub Pages
+         ↓
+✅ Live!
 ```
-
----
-
-## 🚀 Quick Start
-
-### Deploy to Production
-```bash
-# 1. Fork this repo
-# 2. Enable GitHub Pages: Settings → Pages → Source: GitHub Actions
-# 3. Add GitHub Secrets:
-#    - RENDER_DEPLOY_HOOK_GATEWAY
-#    - RENDER_DEPLOY_HOOK_URLSHORTENER  
-#    - RENDER_DEPLOY_HOOK_REDIRECT
-# 4. Push to main → Auto deploy!
-```
-
-### Run Locally
-```bash
-docker-compose up --build
-```
-- Frontend: http://localhost:3000
-- Gateway: http://localhost:5000
-- RabbitMQ UI: http://localhost:15672 (guest/guest)
-
----
-
-## 📡 API
-
-**Base URL**: `https://urlshortener-gateway.onrender.com`
-
-```bash
-# Create short URL
-POST /api/urls
-Body: { "OriginalUrl": "https://google.com" }
-
-# Get all URLs
-GET /api/urls
-
-# Redirect
-GET /{shortCode}
-```
-
----
 
 ## 🛠️ Tech Stack
 
-| Component | Technology | Platform |
-|-----------|-----------|----------|
-| Frontend | React + TypeScript + Vite | GitHub Pages (FREE) |
-| Gateway | .NET 8 + Ocelot | Render.com (FREE) |
-| Backend | .NET 8 + EF Core | Render.com (FREE) |
-| Worker | .NET 8 + RabbitMQ | Railway.app (~$1/month) |
-| Database | PostgreSQL 16 | Render.com (FREE) |
-| Message Queue | RabbitMQ | CloudAMQP (FREE) |
+### Backend
+- **.NET 8**: Web API framework
+- **Ocelot**: API Gateway  
+- **Entity Framework Core 8**: ORM
+- **Npgsql**: PostgreSQL provider
+- **RabbitMQ.Client**: Message broker client
+- **Swagger/OpenAPI**: API documentation
 
-**💰 Total Cost**: ~$1/month (Analytics worker only)
+### Frontend
+- **React 18**: UI library
+- **TypeScript**: Type-safe JavaScript
+- **Vite**: Build tool & dev server
+- **Axios**: HTTP client
+- **React Router**: SPA routing
 
----
+### Infrastructure & Deployment
+- **PostgreSQL 16**: Relational database (Render.com)
+- **RabbitMQ**: Message broker (CloudAMQP)
+- **Docker**: Containerization (local dev)
+- **GitHub Actions**: CI/CD pipeline
+- **Render.com**: Backend hosting (FREE tier)
+- **Railway.app**: Analytics worker (~$1/month)
+- **GitHub Pages**: Frontend hosting (FREE)
+
 
 ## 📂 Project Structure
 
 ```
-├── .github/workflows/deploy-render.yml  # CI/CD
+URLShortener/
+├── .github/
+│   └── workflows/
+│       └── deploy-render.yml       # CI/CD: Backend (Render) + Frontend (GitHub Pages)
 ├── src/
-│   ├── Frontend/                        # React app
-│   ├── Gateway/                         # Ocelot API Gateway
+│   ├── Frontend/                   # React + TypeScript + Vite
+│   │   ├── src/
+│   │   ├── public/
+│   │   ├── Dockerfile
+│   │   └── package.json
+│   ├── Gateway/                    # Ocelot API Gateway
+│   │   ├── ocelot.json            # Route configuration
+│   │   ├── Program.cs
+│   │   └── Dockerfile
 │   ├── Services/
-│   │   ├── UrlShortenerService/        # Create URLs
-│   │   ├── RedirectService/            # Redirect + RabbitMQ
-│   │   └── AnalyticsService/           # Background worker
-│   └── Shared/                         # DTOs, Models, Messages
-└── docker-compose.yml
+│   │   ├── UrlShortenerService/   # URL creation & management
+│   │   │   ├── Controllers/
+│   │   │   ├── Data/
+│   │   │   ├── Migrations/
+│   │   │   └── Dockerfile
+│   │   ├── RedirectService/       # URL redirection + RabbitMQ publisher
+│   │   │   ├── Controllers/
+│   │   │   ├── Data/
+│   │   │   ├── Services/
+│   │   │   └── Dockerfile
+│   │   └── AnalyticsService/      # Background worker
+│   │       ├── Worker.cs
+│   │       ├── Data/
+│   │       └── Dockerfile
+│   └── Shared/                    # Shared DTOs, Models, Messages
+│       ├── DTOs/
+│       ├── Models/
+│       └── Messages/
+├── docker-compose.yml
+├── railway.toml                   # Railway.app config for Analytics
+└── README.md
 ```
-
----
 
 ## 🔧 Development
 
-```bash
-# Backend
-dotnet restore
-dotnet run --project src/Services/UrlShortenerService
-
-# Frontend
-cd src/Frontend
-npm install && npm run dev
-
-# Database migrations
-cd src/Services/UrlShortenerService
-dotnet ef migrations add InitialCreate
-dotnet ef database update
-```
-
----
-
-## 📊 Database Schema
-
-**UrlMappings**
-```sql
-CREATE TABLE "UrlMappings" (
-    "Id" SERIAL PRIMARY KEY,
-    "OriginalUrl" TEXT NOT NULL,
-    "ShortCode" VARCHAR(8) UNIQUE NOT NULL,
-    "CreatedAt" TIMESTAMP WITH TIME ZONE NOT NULL
-);
-```
-
-**ClickEvents**
-```sql
-CREATE TABLE "ClickEvents" (
-    "Id" SERIAL PRIMARY KEY,
-    "ShortCode" VARCHAR(8) NOT NULL,
-    "Timestamp" TIMESTAMP WITH TIME ZONE NOT NULL,
-    "UserAgent" VARCHAR(500),
-    "IpAddress" VARCHAR(45)
-);
-```
-
----
-
-## 📝 Environment Variables
-
-**Render Services**
-```bash
-DATABASE_URL=postgres://...
-RabbitMQ__HostName=shark.rmq.cloudamqp.com
-RabbitMQ__Port=5672
-RabbitMQ__UserName=mrawftdh
-RabbitMQ__Password=***
-RabbitMQ__VirtualHost=mrawftdh
-```
-
-**Gateway**
-```bash
-URL_SHORTENER_HOST=urlshortener-service-lwo4.onrender.com
-REDIRECT_SERVICE_HOST=urlshortener-redirect.onrender.com
-GATEWAY_BASE_URL=https://urlshortener-gateway.onrender.com
-```
-
----
-
-## ✨ Features
-
-- ✅ Auto-generate 8-char short codes
-- ✅ Fast redirect with PostgreSQL
-- ✅ Click tracking with RabbitMQ
-- ✅ Event-driven analytics
-- ✅ Auto-deploy with GitHub Actions
-- ✅ Swagger API docs
-- ✅ Docker support
-
----
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
----
-
-## 📄 License
-
-MIT License
-
-## 👨‍💻 Author
-
-**tuandthe** - [GitHub](https://github.com/tuandthe)
-
----
-
-**Happy Coding! 🚀**
+### Prerequisites
+- .NET 8 SDK
+- Node.js 18+
+- Docker Desktop
+- PostgreSQL 16 (or use Docker)
+- RabbitMQ (or use CloudAMQP)
 
 
