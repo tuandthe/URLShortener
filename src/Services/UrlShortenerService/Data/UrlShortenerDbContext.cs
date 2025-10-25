@@ -34,7 +34,7 @@ public class UrlShortenerDbContext : DbContext
 
             entity.Property(e => e.CreatedAt)
                 .IsRequired()
-                .HasColumnType("DATETIME");
+                .HasColumnType("TIMESTAMP");
 
             // Index cho ShortCode để tìm kiếm nhanh
             entity.HasIndex(e => e.ShortCode)

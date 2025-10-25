@@ -12,8 +12,8 @@ using URLShortener.AnalyticsService.Data;
 namespace URLShortener.AnalyticsService.Migrations
 {
     [DbContext(typeof(AnalyticsDbContext))]
-    [Migration("20251025094311_InitialCreatePostgreSQL")]
-    partial class InitialCreatePostgreSQL
+    [Migration("20251025125838_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,7 +43,7 @@ namespace URLShortener.AnalyticsService.Migrations
                         .HasColumnType("VARCHAR(8)");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("TIMESTAMP");
 
                     b.Property<string>("UserAgent")
                         .HasMaxLength(500)

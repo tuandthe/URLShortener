@@ -12,8 +12,8 @@ using URLShortener.RedirectService.Data;
 namespace URLShortener.RedirectService.Migrations
 {
     [DbContext(typeof(RedirectDbContext))]
-    [Migration("20251025094246_InitialCreatePostgreSQL")]
-    partial class InitialCreatePostgreSQL
+    [Migration("20251025125715_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace URLShortener.RedirectService.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("TIMESTAMP");
 
                     b.Property<string>("OriginalUrl")
                         .IsRequired()
