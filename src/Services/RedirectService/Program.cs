@@ -22,6 +22,24 @@ builder.Services.AddCors(options =>
 
 // Configure Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Parse PostgreSQL URI if needed (Render format)
+if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres"))
+{
+    try
+    {
+        var uri = new Uri(connectionString);
+        var db = uri.AbsolutePath.Trim('/');
+        var userInfo = uri.UserInfo.Split(':');
+        connectionString = $"Host={uri.Host};Port={uri.Port};Database={db};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error parsing connection string: {ex.Message}");
+        throw;
+    }
+}
+
 builder.Services.AddDbContext<RedirectDbContext>(options =>
     options.UseNpgsql(connectionString));
 
