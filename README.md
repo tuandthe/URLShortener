@@ -46,7 +46,271 @@ Hệ thống rút gọn link hoàn chỉnh được xây dựng theo kiến trú
 
 ## 📦 Các thành phần
 
-### Backend Services (C# .NET 9)
+### Backend Services (.NET 8)
+
+1. **API Gateway** (Port 5000)
+   - Ocelot API Gateway
+   - Routing và Load Balancing
+   - Authentication & Authorization
+
+2. **URL Shortener Service** (Port 5001)
+   - Tạo mã rút gọn link
+   - Quản lý URL mappings
+   - RESTful API
+
+3. **Redirect Service** (Port 5002)
+   - Xử lý redirect từ short code → original URL
+   - Ghi nhận click events
+   - Publish events tới RabbitMQ
+
+4. **Analytics Service** (Background Worker)
+   - Consume click events từ RabbitMQ
+   - Lưu trữ analytics data
+   - Thống kê số lượt click
+
+### Frontend
+
+- **React** với TypeScript
+- **Vite** build tool
+- **Axios** cho HTTP requests
+- Giao diện tạo và quản lý short URLs
+
+### Infrastructure
+
+- **MySQL**: Database cho URL mappings và analytics
+- **RabbitMQ**: Message broker cho event-driven architecture
+- **Docker & Docker Compose**: Containerization
+- **Railway**: Cloud deployment platform
+
+## 🚀 Deploy lên Railway với GitHub Actions
+
+### Prerequisites
+
+1. Tài khoản [Railway](https://railway.app)
+2. Repository GitHub
+3. Railway Token và Project ID
+
+### Bước 1: Setup Railway Project
+
+1. Login vào railway.app
+2. Tạo **New Project** → **Empty Project**
+3. Thêm các services:
+   - **MySQL Database**
+   - **RabbitMQ** (Docker image: `rabbitmq:3-management`)
+   - **4 Empty Services**: `gateway`, `urlshortener-service`, `redirect-service`, `analytics-service`
+
+### Bước 2: Configure Environment Variables
+
+**Gateway:**
+```
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://+:$PORT
+```
+
+**UrlShortener Service:**
+```
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://+:$PORT
+ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
+BaseUrl=https://${{gateway.RAILWAY_PUBLIC_DOMAIN}}
+```
+
+**Redirect Service:**
+```
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://+:$PORT
+ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
+RabbitMQ__HostName=${{rabbitmq.RAILWAY_PRIVATE_DOMAIN}}
+RabbitMQ__Port=5672
+RabbitMQ__UserName=guest
+RabbitMQ__Password=guest
+```
+
+**Analytics Service:**
+```
+DOTNET_ENVIRONMENT=Production
+ConnectionStrings__DefaultConnection=${{MySQL.DATABASE_URL}}
+RabbitMQ__HostName=${{rabbitmq.RAILWAY_PRIVATE_DOMAIN}}
+RabbitMQ__Port=5672
+RabbitMQ__UserName=guest
+RabbitMQ__Password=guest
+```
+
+### Bước 3: Setup GitHub Secrets
+
+Vào GitHub Repository → Settings → Secrets and variables → Actions
+
+Thêm 2 secrets:
+- **RAILWAY_TOKEN**: Lấy từ railway.app/account/tokens
+- **RAILWAY_PROJECT_ID**: Lấy từ Railway Project Settings
+
+### Bước 4: Deploy
+
+```bash
+git add .
+git commit -m "Deploy to Railway"
+git push origin main
+```
+
+GitHub Actions sẽ tự động:
+- Build Docker images
+- Deploy lên Railway
+- Chạy migrations
+- Start services
+
+### Bước 5: Generate Public Domain
+
+1. Vào Railway Gateway service
+2. Settings → Networking → Generate Domain
+3. Sử dụng domain này để truy cập ứng dụng
+
+## 🛠️ Tech Stack
+
+### Backend
+- **.NET 8**: Web API framework
+- **Ocelot**: API Gateway
+- **Entity Framework Core**: ORM
+- **MySQL**: Relational database
+- **RabbitMQ**: Message broker
+
+### Frontend
+- **React 18**: UI library
+- **TypeScript**: Type-safe JavaScript
+- **Vite**: Build tool
+- **Axios**: HTTP client
+
+### DevOps
+- **Docker**: Containerization
+- **GitHub Actions**: CI/CD
+- **Railway**: Cloud platform
+
+## 📝 API Endpoints
+
+### URL Shortener Service (`/api/urls`)
+
+```bash
+# Tạo short URL
+POST /api/urls
+Body: { "longUrl": "https://example.com" }
+
+# Lấy danh sách URLs
+GET /api/urls
+
+# Lấy URL theo ID
+GET /api/urls/{id}
+
+# Xóa URL
+DELETE /api/urls/{id}
+```
+
+### Redirect Service
+
+```bash
+# Redirect từ short code
+GET /{shortCode}
+```
+
+## 🏃 Run Locally với Docker Compose
+
+```bash
+# Build và start tất cả services
+docker-compose up --build
+
+# Stop tất cả services
+docker-compose down
+
+# Xem logs
+docker-compose logs -f [service-name]
+```
+
+Services sẽ chạy tại:
+- Frontend: http://localhost:3000
+- API Gateway: http://localhost:5000
+- URL Shortener: http://localhost:5001
+- Redirect Service: http://localhost:5002
+- MySQL: localhost:3308
+- RabbitMQ Management: http://localhost:15672
+
+## 📂 Project Structure
+
+```
+URLShortener/
+├── src/
+│   ├── Frontend/              # React app
+│   ├── Gateway/               # Ocelot API Gateway
+│   ├── Services/
+│   │   ├── UrlShortenerService/
+│   │   ├── RedirectService/
+│   │   └── AnalyticsService/
+│   └── Shared/                # Shared DTOs, Models
+├── .github/
+│   └── workflows/
+│       └── deploy-railway.yml # GitHub Actions workflow
+├── docker-compose.yml
+└── README.md
+```
+
+## 🔧 Development
+
+### Prerequisites
+- .NET 8 SDK
+- Node.js 18+
+- Docker Desktop
+- MySQL
+- RabbitMQ
+
+### Backend Development
+
+```bash
+# Restore dependencies
+dotnet restore
+
+# Run migrations
+dotnet ef database update --project src/Services/UrlShortenerService
+
+# Run service
+dotnet run --project src/Services/UrlShortenerService
+```
+
+### Frontend Development
+
+```bash
+cd src/Frontend
+npm install
+npm run dev
+```
+
+## 📊 Features
+
+- ✅ Tạo mã rút gọn link tự động
+- ✅ Redirect nhanh từ short code
+- ✅ Tracking số lượt click
+- ✅ Analytics dashboard
+- ✅ RESTful API
+- ✅ Event-driven architecture
+- ✅ Microservices architecture
+- ✅ Docker containerization
+- ✅ CI/CD với GitHub Actions
+- ✅ Cloud deployment trên Railway
+
+## 🤝 Contributing
+
+Contributions, issues và feature requests đều được welcome!
+
+## 📄 License
+
+This project is [MIT](LICENSE) licensed.
+
+## 👨‍💻 Author
+
+**tuandthe**
+
+- GitHub: [@tuandthe](https://github.com/tuandthe)
+- Repository: [URLShortener](https://github.com/tuandthe/URLShortener)
+
+---
+
+**Happy Coding! 🚀**
 
 1. **API Gateway** - Điểm vào duy nhất cho hệ thống
    - Framework: ASP.NET Core với Ocelot
