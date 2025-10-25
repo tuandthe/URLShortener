@@ -1,6 +1,5 @@
 
 # URL Shortener - Microservices
-# URL Shortener - Microservices# URL Shortener - Microservices
 
 Hệ thống rút gọn URL với kiến trúc microservices: .NET 8, React, PostgreSQL, RabbitMQ.
 
@@ -53,29 +52,29 @@ Hệ thống rút gọn URL với kiến trúc microservices: .NET 8, React, Pos
 
 ### Backend Services (.NET 8)
 
-1. **API Gateway** - https://urlshortener-gateway.onrender.com
+1. **API Gateway** 
    - Ocelot API Gateway
    - Routing và Load Balancing
    - HTTPS + CORS enabled
-   - **Platform**: Render.com (FREE)
+   - **Platform**: Render.com 
 
-2. **URL Shortener Service** - https://urlshortener-service-lwo4.onrender.com
+2. **URL Shortener Service** 
    - Tạo mã rút gọn link (8 ký tự)
    - Quản lý URL mappings
    - RESTful API với Swagger
-   - **Platform**: Render.com (FREE)
+   - **Platform**: Render.com 
 
-3. **Redirect Service** - https://urlshortener-redirect.onrender.com
+3. **Redirect Service** 
    - Xử lý redirect từ short code → original URL
    - Ghi nhận click events
    - Publish events tới RabbitMQ
-   - **Platform**: Render.com (FREE)
+   - **Platform**: Render.com 
 
 4. **Analytics Service**
    - Consume click events từ RabbitMQ
    - Lưu trữ analytics data (ClickEvents table)
    - Thống kê số lượt click
-   - **Platform**: Railway.app (~$0.50-1/month)
+   - **Platform**: Railway.app 
 
 ### Frontend
 
@@ -83,15 +82,15 @@ Hệ thống rút gọn URL với kiến trúc microservices: .NET 8, React, Pos
 - **Vite** build tool
 - **Axios** cho HTTP requests
 - Giao diện tạo và quản lý short URLs
-- **Platform**: GitHub Pages (FREE)
+- **Platform**: GitHub Pages 
 - **URL**: https://tuandthe.github.io/URLShortener
 
 ### Infrastructure
 
-- **PostgreSQL 16**: Database trên Render.com (FREE)
+- **PostgreSQL 16**: Database trên Render.com 
   - Shared database cho tất cả services
   - Tables: `UrlMappings`, `ClickEvents`
-- **RabbitMQ**: CloudAMQP (FREE tier - Little Lemur)
+- **RabbitMQ**: CloudAMQP 
   - Host: shark.rmq.cloudamqp.com
   - VirtualHost: mrawftdh
 - **Docker**: Local development với Docker Compose
@@ -130,15 +129,6 @@ Backend    Frontend
 - **Vite**: Build tool & dev server
 - **Axios**: HTTP client
 - **React Router**: SPA routing
-
-### Infrastructure & Deployment
-- **PostgreSQL 16**: Relational database (Render.com)
-- **RabbitMQ**: Message broker (CloudAMQP)
-- **Docker**: Containerization (local dev)
-- **GitHub Actions**: CI/CD pipeline
-- **Render.com**: Backend hosting (FREE tier)
-- **Railway.app**: Analytics worker (~$1/month)
-- **GitHub Pages**: Frontend hosting (FREE)
 
 
 ## 📂 Project Structure
@@ -181,14 +171,5 @@ URLShortener/
 ├── railway.toml                   # Railway.app config for Analytics
 └── README.md
 ```
-
-## 🔧 Development
-
-### Prerequisites
-- .NET 8 SDK
-- Node.js 18+
-- Docker Desktop
-- PostgreSQL 16 (or use Docker)
-- RabbitMQ (or use CloudAMQP)
 
 
