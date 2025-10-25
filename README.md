@@ -2,7 +2,6 @@
 # URL Shortener - Microservices
 # URL Shortener - Microservices# URL Shortener - Microservices
 
-
 Hệ thống rút gọn URL với kiến trúc microservices: .NET 8, React, PostgreSQL, RabbitMQ.
 
 🏗️ Kiến trúc hệ thống
