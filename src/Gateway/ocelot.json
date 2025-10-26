@@ -2,25 +2,42 @@
     "Routes": [
         {
             "DownstreamPathTemplate": "/api/urls",
-            "DownstreamScheme": "http",
+            "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
                 {
-                    "Host": "urlshortener-service",
-                    "Port": 8080
+                    "Host": "#{URL_SHORTENER_HOST}#",
+                    "Port": 443
                 }
             ],
-            "UpstreamPathTemplate": "/api/shorten",
+            "UpstreamPathTemplate": "/api/urls",
             "UpstreamHttpMethod": [
-                "Post"
+                "Get",
+                "Post",
+                "Delete"
+            ]
+        },
+        {
+            "DownstreamPathTemplate": "/api/urls/{id}",
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "#{URL_SHORTENER_HOST}#",
+                    "Port": 443
+                }
+            ],
+            "UpstreamPathTemplate": "/api/urls/{id}",
+            "UpstreamHttpMethod": [
+                "Get",
+                "Delete"
             ]
         },
         {
             "DownstreamPathTemplate": "/{shortCode}",
-            "DownstreamScheme": "http",
+            "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
                 {
-                    "Host": "redirect-service",
-                    "Port": 8080
+                    "Host": "#{REDIRECT_SERVICE_HOST}#",
+                    "Port": 443
                 }
             ],
             "UpstreamPathTemplate": "/{shortCode}",
@@ -30,6 +47,6 @@
         }
     ],
     "GlobalConfiguration": {
-        "BaseUrl": "http://gateway:8080"
+        "BaseUrl": "#{GATEWAY_BASE_URL}#"
     }
 }

@@ -3,8 +3,18 @@ using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Ocelot configuration
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+// Replace environment variable placeholders in ocelot.json
+var ocelotConfig = File.ReadAllText("ocelot.json");
+ocelotConfig = ocelotConfig
+    .Replace("#{URL_SHORTENER_HOST}#", Environment.GetEnvironmentVariable("URL_SHORTENER_HOST") ?? "urlshortener-service")
+    .Replace("#{REDIRECT_SERVICE_HOST}#", Environment.GetEnvironmentVariable("REDIRECT_SERVICE_HOST") ?? "redirect-service")
+    .Replace("#{GATEWAY_BASE_URL}#", Environment.GetEnvironmentVariable("GATEWAY_BASE_URL") ?? "http://gateway:8080");
+
+var tempOcelotPath = Path.Combine(Path.GetTempPath(), "ocelot.runtime.json");
+File.WriteAllText(tempOcelotPath, ocelotConfig);
+
+// Add Ocelot configuration with replaced values
+builder.Configuration.AddJsonFile(tempOcelotPath, optional: false, reloadOnChange: false);
 
 // Add services to the container
 builder.Services.AddEndpointsApiExplorer();

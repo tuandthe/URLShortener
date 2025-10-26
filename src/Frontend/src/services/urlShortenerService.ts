@@ -24,13 +24,14 @@ export interface ErrorResponse {
  * Service để gọi API tạo URL rút gọn
  */
 class UrlShortenerService {
+
     /**
      * Tạo URL rút gọn
      */
     async createShortUrl(originalUrl: string): Promise<CreateShortUrlResponse> {
         try {
             const response = await axios.post<CreateShortUrlResponse>(
-                `${API_BASE_URL}/api/shorten`,
+                `${API_BASE_URL}/api/urls`,
                 {
                     originalUrl
                 } as CreateShortUrlRequest

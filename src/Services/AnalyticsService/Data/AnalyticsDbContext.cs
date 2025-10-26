@@ -30,7 +30,7 @@ public class AnalyticsDbContext : DbContext
 
             entity.Property(e => e.Timestamp)
                 .IsRequired()
-                .HasColumnType("DATETIME");
+                .HasColumnType("timestamp with time zone");
 
             entity.Property(e => e.UserAgent)
                 .HasMaxLength(500)

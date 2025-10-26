@@ -36,17 +36,20 @@ public class Worker : BackgroundService
         _logger.LogInformation("Analytics Worker Service starting...");
         try
         {
-            // Test kết nối đến database
+            // Run database migration
             using var scope = _serviceProvider.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AnalyticsDbContext>();
-            await dbContext.Database.CanConnectAsync(cancellationToken);
-            _logger.LogInformation("Database connection successful");
+
+            _logger.LogInformation("Starting database migration...");
+            await dbContext.Database.MigrateAsync(cancellationToken);
+            _logger.LogInformation("Database migration completed successfully");
+
             await InitializeRabbitMqAsync();
             await base.StartAsync(cancellationToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to connect to the database on startup");
+            _logger.LogError(ex, "Failed to start Analytics Worker Service");
             throw;
         }
     }
@@ -58,7 +61,8 @@ public class Worker : BackgroundService
             HostName = _configuration["RabbitMQ:HostName"] ?? "localhost",
             Port = int.Parse(_configuration["RabbitMQ:Port"] ?? "5672"),
             UserName = _configuration["RabbitMQ:UserName"] ?? "guest",
-            Password = _configuration["RabbitMQ:Password"] ?? "guest"
+            Password = _configuration["RabbitMQ:Password"] ?? "guest",
+            VirtualHost = _configuration["RabbitMQ:VirtualHost"] ?? "/"
         };
 
         var retryCount = 0;
