@@ -39,14 +39,6 @@ const HistoryList: React.FC<HistoryListProps> = ({ onUrlSelect, limit, onViewAll
             loadHistory();
         }
     };
-
-    const handleClearAll = () => {
-        if (window.confirm('Bạn có chắc muốn xóa toàn bộ lịch sử?')) {
-            urlHistoryService.clearHistory();
-            loadHistory();
-        }
-    };
-
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
         const now = new Date();
