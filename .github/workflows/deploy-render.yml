@@ -39,6 +39,7 @@ jobs:
         working-directory: src/Frontend
         env:
           REACT_APP_API_URL: https://urlshortener-gateway-production.up.railway.app
+          CI: false
 
         run: npm run build
 
